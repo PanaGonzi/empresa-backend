@@ -49,6 +49,23 @@ class TareaControllerTest {
 	}
 
 	@Test
+	void fechaDeCreacionSeGuardaEnUtc() throws Exception {
+		// La JVM va en Tokio (UTC+9) durante todo el ciclo: la fecha guardada debe seguir siendo UTC
+		java.util.TimeZone original = java.util.TimeZone.getDefault();
+		java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("Asia/Tokyo"));
+		try {
+			crear("{\"titulo\":\"Zona horaria\"}");
+			java.time.LocalDateTime creada = repository.findAll().get(0).getCreadaEn();
+			java.time.LocalDateTime ahoraUtc = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC);
+			org.junit.jupiter.api.Assertions.assertTrue(
+					java.time.Duration.between(creada, ahoraUtc).abs().toMinutes() < 1,
+					"creadaEn debe estar en UTC, pero es " + creada);
+		} finally {
+			java.util.TimeZone.setDefault(original);
+		}
+	}
+
+	@Test
 	void rechazaTituloVacio() throws Exception {
 		mvc.perform(post("/api/tareas").contentType(MediaType.APPLICATION_JSON).content("{\"titulo\":\"   \"}"))
 				.andExpect(status().isBadRequest());
