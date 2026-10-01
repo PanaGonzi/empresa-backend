@@ -1,6 +1,7 @@
 package com.empresa.backend.tarea;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -33,7 +34,8 @@ public class Tarea {
 
 	@PrePersist
 	void alCrear() {
-		creadaEn = LocalDateTime.now();
+		// Siempre en UTC, independiente de la zona horaria de la maquina o el contenedor
+		creadaEn = LocalDateTime.now(ZoneOffset.UTC);
 	}
 
 	public Long getId() {
