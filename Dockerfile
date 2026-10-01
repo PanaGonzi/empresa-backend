@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # --- Etapa 1: compilar ---
-FROM eclipse-temurin:17-jdk AS build
+# La compilacion no depende de la arquitectura: se ejecuta en la nativa del runner (sin emulacion)
+FROM --platform=$BUILDPLATFORM eclipse-temurin:17-jdk AS build
 WORKDIR /app
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
